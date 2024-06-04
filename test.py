@@ -1,3 +1,3 @@
-from time_extractor import get_time
+import main_wb_sender
 
-get_time('1. Алексей пол мужской 13:15мск')
+print(main_wb_sender.get_supply_id(name='Автобот (НЕ УДАЛЯТЬ НЕ ОТПРАВЛЯТЬ)'))
