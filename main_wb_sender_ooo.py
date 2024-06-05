@@ -144,10 +144,11 @@ if __name__ == '__main__':
                 print(e)
 
         questions = get_unanswered_questions()
-        for question in questions:
-            question_id = question['id']
-            question_text = question['text']
-            answer_question(question_id)
-            json_reader.check_matching_foot(question_text)
+        if questions:
+            for question in questions:
+                question_id = question['id']
+                question_text = question['text']
+                answer_question(question_id)
+                json_reader.check_matching_foot(question_text)
 
         time.sleep(GLOBAL_TIMEOUT)

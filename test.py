@@ -47,6 +47,6 @@
 
 # json_reader.check_matching_foot('vfkmxbr слава 20:35')
 
-# from main_wb_sender import get_new_orders
+from main_wb_sender_ooo import get_new_orders
 
-# print(get_new_orders())
+print(get_new_orders())
