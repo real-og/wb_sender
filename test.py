@@ -43,6 +43,10 @@
 # bot.send_reaction(-1002196923729, 21)
 # bot.reply_message(-1002196923729, 22, 'ff')
 
-import json_reader
+# import json_reader
 
-json_reader.check_matching_foot('vfkmxbr слава 20:35')
+# json_reader.check_matching_foot('vfkmxbr слава 20:35')
+
+# from main_wb_sender import get_new_orders
+
+# print(get_new_orders())
