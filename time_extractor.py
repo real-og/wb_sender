@@ -4,7 +4,7 @@ from datetime import datetime
 
 
 def get_minutes_from_str(iso_string):
-    dt = datetime.datetime.strptime(iso_string, "%Y-%m-%dT%H:%M:%SZ")
+    dt = datetime.strptime(iso_string, "%Y-%m-%dT%H:%M:%SZ")
     minutes = dt.minute
     return  minutes
 

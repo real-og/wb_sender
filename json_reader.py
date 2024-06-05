@@ -7,7 +7,7 @@ def add_foot_and_update_json(file_path, new_element):
     try:
         with open(file_path, 'r', encoding='utf-8') as file:
             data = json.load(file)
-        data = [item for item in data if int(item['timestamp']) + 2 * 24 * 60 * 60 < current_unix_timestamp()]
+        data = [item for item in data if int(item['timestamp']) + 2 * 24 * 60 * 60 > current_unix_timestamp()]
         data.append(new_element)
         with open(file_path, 'w', encoding='utf-8') as file:
             json.dump(data, file, ensure_ascii=False, indent=4)

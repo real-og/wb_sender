@@ -22,26 +22,6 @@ def reply_message(group_id, message_id, text):
     asyncio.run(async_reply_message(group_id, message_id, text))
 
 
-def check_matching_foot(question_text):
-    try:
-        question_mins = time_extractor.extract_time(question_text)
-        with open('feet_json', 'r', encoding='utf-8') as file:
-            data = json.load(file)
-        
-        for element in data:
-            if int(element['mins']) + 1 >= int(question_mins) and int(element['mins']) - 1 <= int(question_mins):
-                send_reaction(GROUP_ID, element['message_id'])
-                reply_message(GROUP_ID, element['message_id'], question_text)
-                element['message_id'] = None
-        
-        data = [item for item in data if item['message_id']]
-        with open('feet.json', 'w', encoding='utf-8') as file:
-            json.dump(data, file, ensure_ascii=False, indent=4)
-    except Exception as e:
-        print(e)
-
-    
-
 
 def send_reaction(chat_id, message_id):
     url = f'https://api.telegram.org/bot{BOT_TOKEN}/setMessageReaction'
