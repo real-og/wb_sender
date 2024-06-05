@@ -1,8 +1,10 @@
 import requests
-from config import TOKEN
-from config import GROUP_ID
+from config import TOKEN, FOOT_ARTICLE, SUPPLY_NAME, GROUP_ID
 import time
 from bot import send_text_message
+import json
+import time_extractor
+import json_reader
 
 
 LOCAL_TIMEOUT = 10
@@ -10,31 +12,55 @@ GLOBAL_TIMEOUT = 20
 BASE_URL = 'https://suppliers-api.wildberries.ru/'
 BASE_QUESTIONS_URL = 'https://feedbacks-api.wildberries.ru/'
 
+
+FOOT_ARTICLE = 'FOOTимя'
 SUPPLY_NAME = 'Автобот (НЕ УДАЛЯТЬ НЕ ОТПРАВЛЯТЬ)'
 
 
 headers = {'Authorization': TOKEN}
 
 
-# def get_ununswered_questions():
-#     url = 'api/v1/questions'
-#     params = {'isAnswered': 'false', 'take': 10000, 'skip': 0, 'nmId': 231460239}
-#     try:
-#         resp = requests.get(BASE_QUESTIONS_URL + url, headers=headers, params=params)
-#         question_objects = resp.json()['data']['questions']
-#         return question_objects
-#     except Exception as e:
-#         print(e)
+def get_unanswered_questions():
+    url = 'api/v1/questions'
+    params = {'isAnswered': 'false', 'take': 10000, 'skip': 0, 'nmId': 231460239}
+    try:
+        resp = requests.get(BASE_QUESTIONS_URL + url, headers=headers, params=params)
+        question_objects = resp.json()['data']['questions']
+        return question_objects
+    except Exception as e:
+        print(e)
 
 
-# def unswer_question(id):
-#     url = 'api/v1/questions'
-#     answer_text = """Здравствуйте. Спасибо за заказ. Ожидайте товар в выбранном Вами пункте выдачи."""
-#     data = {'id': id, 'answer': {'text': answer_text}}
-#     try:
-#         requests.patch(BASE_QUESTIONS_URL + url, headers=headers, json=data)
-#     except Exception as e:
-#         print(e)
+def answer_question(id):
+    url = 'api/v1/questions'
+    answer_text = """Здравствуйте. Спасибо за заказ. Ожидайте товар в выбранном Вами пункте выдачи."""
+    data = {'id': id, 'answer': {'text': answer_text}, 'state': 'wbRu'}
+    try:
+        resp = requests.patch(BASE_QUESTIONS_URL + url, headers=headers, json=data)
+        print(resp.text)
+    except Exception as e:
+        print(e)
+
+
+def get_feet():
+    url = 'api/v3/orders'
+    from_time = int(time.time()) - 7 * 24 * 60 * 60
+    params = {'limit': 1000, 'next': 0, 'dateFrom': from_time}
+    try:
+        resp = requests.get(BASE_URL + url, headers=headers, params=params)
+        orders = resp.json()['orders']
+        feet = []
+        for order in orders:
+            if order['article'] == 'FOOTимя' and order['supplyId']:
+                feet.append(order)
+        with open('resp.json', 'w') as file:
+            json.dump(feet, file, indent=4)
+        return feet
+    except Exception as e:
+        print(e)
+        return None
+
+
 
 
 def get_supply_id(name):
@@ -105,7 +131,23 @@ if __name__ == '__main__':
                 time.sleep(LOCAL_TIMEOUT)
                 qr_id = get_qr_id(order_id)
                 article = order.get('article')
-                send_text_message(GROUP_ID, f"{article} - {qr_id}")
+                message_id = send_text_message(GROUP_ID, f'{article} - {qr_id}')
+                if article == FOOT_ARTICLE:
+                    # проверить формат 
+                    timestamp = time_extractor.get_unix_from_str(str(order['createdAt']))
+                    mins = time_extractor.get_minutes_from_str(str(order['createdAt']))
+                    foot_element = {'timestamp': timestamp,
+                                    'mins': mins,
+                                    'message_id': int(message_id)}
+                    json_reader.add_foot_and_update_json('feet.json', foot_element)
             except Exception as e:
                 print(e)
+
+        questions = get_unanswered_questions()
+        for question in questions:
+            question_id = question['id']
+            question_text = question['text']
+            answer_question(question_id)
+            json_reader.check_matching_foot(question_text)
+
         time.sleep(GLOBAL_TIMEOUT)

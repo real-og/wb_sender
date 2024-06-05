@@ -8,3 +8,6 @@ TOKEN = str(os.environ.get("TOKEN"))
 BOT_TOKEN = str(os.environ.get("BOT_TOKEN"))
 
 GROUP_ID = str(os.environ.get("GROUP_ID"))
+
+FOOT_ARTICLE = 'FOOTимя'
+SUPPLY_NAME = 'Автобот (НЕ УДАЛЯТЬ НЕ ОТПРАВЛЯТЬ)'
