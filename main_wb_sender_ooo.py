@@ -148,7 +148,10 @@ if __name__ == '__main__':
             for question in questions:
                 question_id = question['id']
                 question_text = question['text']
-                answer_question(question_id)
-                json_reader.check_matching_foot(question_text)
+                if time_extractor.extract_time_mins(question_text):
+                    answer_question(question_id)
+                    json_reader.check_matching_foot(question_text)
+                else:
+                    send_text_message(GROUP_ID, question_text + "\n\nНе отвечено")
 
         time.sleep(GLOBAL_TIMEOUT)
