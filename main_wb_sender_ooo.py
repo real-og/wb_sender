@@ -6,6 +6,7 @@ import json
 import time_extractor
 import json_reader
 
+UNANSWERED_QUESTION_IDS = []
 
 LOCAL_TIMEOUT = 10
 GLOBAL_TIMEOUT = 20
@@ -152,6 +153,8 @@ if __name__ == '__main__':
                     answer_question(question_id)
                     json_reader.check_matching_foot(question_text)
                 else:
-                    send_text_message(GROUP_ID, question_text + "\n\nНе отвечено")
+                    if not (question_id in UNANSWERED_QUESTION_IDS):
+                        UNANSWERED_QUESTION_IDS.append(question_id)
+                        send_text_message(GROUP_ID, question_text + "\n\nНе отвечено")
 
         time.sleep(GLOBAL_TIMEOUT)
