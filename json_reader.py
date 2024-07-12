@@ -53,6 +53,8 @@ def check_matching_foot(question_text):
         data = [item for item in data if item['message_id']]
         with open('feet.json', 'w', encoding='utf-8') as file:
             json.dump(data, file, ensure_ascii=False, indent=4)
+
+        return isFound
     except Exception as e:
         print(e)
 

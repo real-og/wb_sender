@@ -33,9 +33,8 @@ def get_unanswered_questions():
         print(e)
 
 
-def answer_question(id):
+def answer_question(id, answer_text):
     url = 'api/v1/questions'
-    answer_text = """Здравствуйте. Спасибо за заказ. Ожидайте товар в выбранном Вами пункте выдачи."""
     data = {'id': id, 'answer': {'text': answer_text}, 'state': 'wbRu'}
     try:
         resp = requests.patch(BASE_QUESTIONS_URL + url, headers=headers, json=data)
@@ -172,8 +171,11 @@ if __name__ == '__main__':
                 question_id = question['id']
                 question_text = question['text']
                 if time_extractor.extract_time_mins(question_text):
-                    answer_question(question_id)
-                    json_reader.check_matching_foot(question_text)
+                    is_found = json_reader.check_matching_foot(question_text)
+                    if is_found:
+                        answer_question(question_id, """Здравствуйте. Спасибо за заказ. Ожидайте товар в выбранном Вами пункте выдачи.""")
+                    else:
+                        answer_question(question_id, """Здравствуйте. Не смогли найти ваш заказ. Пожалуйста проверьте информацию в личном кабинете.""")
                 else:
                     if not (question_id in UNANSWERED_QUESTION_IDS):
                         UNANSWERED_QUESTION_IDS.append(question_id)
