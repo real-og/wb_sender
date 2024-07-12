@@ -3,7 +3,22 @@ from time_extractor import current_unix_timestamp, extract_time_mins
 from config import GROUP_ID
 import bot
 
-def add_foot_and_update_json(file_path, new_element):
+
+def check_orders(file_path, qr):
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            data = json.load(file)
+            data = [item for item in data if int(item['timestamp']) + 2 * 24 * 60 * 60 > current_unix_timestamp()]
+            for order in data:
+                if int(order['qr']) == int(qr):
+                    return True
+        return False
+
+    except Exception as e:
+        print(e)
+
+
+def add_element_json(file_path, new_element):
     try:
         with open(file_path, 'r', encoding='utf-8') as file:
             data = json.load(file)

@@ -8,6 +8,7 @@ import json_reader
 
 UNANSWERED_QUESTION_IDS = []
 
+MINI_TIMEOUT = 5
 LOCAL_TIMEOUT = 10
 GLOBAL_TIMEOUT = 20
 BASE_URL = 'https://suppliers-api.wildberries.ru/'
@@ -117,6 +118,18 @@ def get_qr_id(order_id):
     except Exception as e:
         print(e)
         return None
+    
+
+def get_qr_full(order_id):
+    url = f'api/v3/orders/stickers'
+    data = {'orders': [order_id]}
+    params = {'type': 'svg', 'width': 40, 'height': 30}
+    try:
+        resp = requests.post(BASE_URL + url, headers=headers, json=data, params=params)
+        return resp.json().get('stickers')[0].get('partA')
+    except Exception as e:
+        print(e)
+        return None
 
 
 if __name__ == '__main__':
@@ -125,6 +138,7 @@ if __name__ == '__main__':
         if supply_id is None:
             supply_id = create_supply(name=SUPPLY_NAME)
         new_orders = get_new_orders()
+        time.sleep(MINI_TIMEOUT)
         for order in new_orders:
             try:
                 order_id = order.get('id')
@@ -132,7 +146,15 @@ if __name__ == '__main__':
                 time.sleep(LOCAL_TIMEOUT)
                 qr_id = get_qr_id(order_id)
                 article = order.get('article')
-                message_id = send_text_message(GROUP_ID, f'{article} - {qr_id}')
+
+                if json_reader.check_orders('orders.json', qr_id):
+                    time.sleep(MINI_TIMEOUT)
+                    full_qr = get_qr_full(order_id)
+                    message_id = send_text_message(GROUP_ID, f'{article} - {qr_id}\nПовторка - {full_qr}')
+                else:
+                    message_id = send_text_message(GROUP_ID, f'{article} - {qr_id}')
+                json_reader.add_element_json('orders.json', {'qr': qr_id, 'timestamp': time_extractor.current_unix_timestamp()})
+
                 if article == FOOT_ARTICLE:
                     # проверить формат 
                     timestamp = time_extractor.get_unix_from_str(str(order['createdAt']))
@@ -140,7 +162,7 @@ if __name__ == '__main__':
                     foot_element = {'timestamp': timestamp,
                                     'mins': mins,
                                     'message_id': int(message_id)}
-                    json_reader.add_foot_and_update_json('feet.json', foot_element)
+                    json_reader.add_element_json('feet.json', foot_element)
             except Exception as e:
                 print(e)
 
