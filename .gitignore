@@ -4,3 +4,4 @@ Pipfile.lock
 nohup.out
 resp.json
 __pycache__
+test.py
