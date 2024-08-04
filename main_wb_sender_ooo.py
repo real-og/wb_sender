@@ -16,7 +16,7 @@ BASE_QUESTIONS_URL = 'https://feedbacks-api.wildberries.ru/'
 
 
 FOOT_ARTICLE = 'FOOTимя'
-SUPPLY_NAME = 'Автобот (НЕ УДАЛЯТЬ НЕ ОТПРАВЛЯТЬ)'
+SUPPLY_NAME = 'АВТОБОТ_3'
 
 
 headers = {'Authorization': TOKEN}
